@@ -11,9 +11,12 @@ Build everything and start QEMU with the VGA console in a new window and the ser
 To exit, either close the VGA window or press Ctrl-c or Ctrl-a x in your terminal.
 
 make qemu-nox
-Like make qemu, but run with only the serial console. To exit, press Ctrl-a x. This is particularly useful over SSH connections to Athena dialups because the VGA window consumes a lot of bandwidth.
+Like make qemu, but run with only the serial console. To exit, press Ctrl-a x. 
+This is particularly useful over SSH connections to Athena dialups because the VGA window consumes a lot of bandwidth.
+
 make gdb
 Start gdb with the settings in the JOS .gdbinit.
+
 make qemu-gdb
 Like make qemu, but rather than passively accepting GDB connections at any time, 
 this pauses at the first machine instruction and waits for a GDB connection.
@@ -107,8 +110,11 @@ Display a hex dump of N words starting at physical address paddr.
 If N is omitted, it defaults to 1. This is the physical memory analogue of GDB's x command.
 
 info registers
-Display a full dump of the machine's internal register state. In particular, this includes the machine's hidden segment state for the segment selectors and the local, global, and interrupt descriptor tables, plus the task register. This hidden state is the information the virtual CPU read from the GDT/LDT when the segment selector was loaded. Here's the CS when running in the JOS kernel in lab 1 and the meaning of each field:
-
+Display a full dump of the machine's internal register state. 
+In particular, this includes the machine's hidden segment state for the segment selectors 
+and the local, global, and interrupt descriptor tables, plus the task register. 
+This hidden state is the information the virtual CPU read from the GDT/LDT when the segment selector was loaded. 
+Here's the CS when running in the JOS kernel in lab 1 and the meaning of each field:
 CS =0008 10000000 ffffffff 10cf9a00 DPL=0 CS32 [-R-]
 
 CS =0008
