@@ -1,1 +1,83 @@
+Lab1: Booting a PC
 
+Introduction:
+此实验分三部分：
+第一部分关注点在熟悉X86汇编语言，QEMU X86 模拟器，PC开机启动程序。
+第二部分检查boot/ 目录下的6.828内核boot loader
+第三部分深入探讨6.828内核本身，称为JOS，它在kernel/ 目录下。
+
+Part1：PC Bootstrap
+
+1.1   getting started with X86 assembly.
+Exercise 1
+Familiarize yourself with the assembly language materials available on the 6.828 reference page. 
+You don't have to read them now, but you'll almost certainly want to refer to some of this material
+when reading and writing x86 assembly.
+
+1.2   simulating the X86
+athena% cd lab
+athena% make
++ as kern/entry.S
++ cc kern/init.c
++ cc kern/console.c
++ cc kern/monitor.c
++ cc kern/printf.c
++ cc lib/printfmt.c
++ cc lib/readline.c
++ cc lib/string.c
++ ld obj/kern/kernel
++ as boot/boot.S
++ cc -Os boot/main.c
++ ld boot/boot
+boot block is 414 bytes (max 510)
++ mk obj/kern/kernel.img
+athena% make qemu
+Booting from Hard Disk...
+6828 decimal is XXX octal!
+entering test_backtrace 5
+entering test_backtrace 4
+entering test_backtrace 3
+entering test_backtrace 2
+entering test_backtrace 1
+entering test_backtrace 0
+leaving test_backtrace 0
+leaving test_backtrace 1
+leaving test_backtrace 2
+leaving test_backtrace 3
+leaving test_backtrace 4
+leaving test_backtrace 5
+Welcome to the JOS kernel monitor!
+Type 'help' for a list of commands.
+K>
+
+The PC's Physical Address Space (PC 物理地址空间)
+现在深入了解一点PC启动的细节。PC机的物理地址空间硬连接具有下列总体布局：
++------------------+  <- 0xFFFFFFFF (4GB)
+|      32-bit      |
+|  memory mapped   |
+|     devices      |
+|                  |
+/\/\/\/\/\/\/\/\/\/\
+
+/\/\/\/\/\/\/\/\/\/\
+|                  |
+|      Unused      |
+|                  |
++------------------+  <- depends on amount of RAM
+|                  |
+|                  |
+| Extended Memory  |
+|                  |
+|                  |
++------------------+  <- 0x00100000 (1MB)
+|     BIOS ROM     |
++------------------+  <- 0x000F0000 (960KB)
+|  16-bit devices, |
+|  expansion ROMs  |
++------------------+  <- 0x000C0000 (768KB)
+|   VGA Display    |
++------------------+  <- 0x000A0000 (640KB)
+|                  |
+|    Low Memory    |
+|                  |
++------------------+  <- 0x00000000
