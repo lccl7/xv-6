@@ -52,3 +52,21 @@ just the general idea of what the BIOS is doing first.
 15 es             0x0    0
 16 fs             0x0    0
 17 gs             0x0    0
+可以看到CS:IP = 0xf000:0xfff0 即BIOS第一条指令地址为0xf000 * 0x10 + 0xfff0 = 0xffff0
+
+即跳转到0xfe05b. 
+如下：
+(gdb) si
+[f000:e05b]    0xfe05b:    cmpl   $0x0,%cs:0x65a4
+0x0000e05b in ?? ()
+(gdb) x/10i 0xfe05b (参考qemu-gdb的调试命令)
+   0xfe05b:    cmpl   $0x0,%cs:0x65a4
+   0xfe062:    jne    0xfd2b9
+   0xfe066:    xor    %ax,%ax
+   0xfe068:    mov    %ax,%ss
+   0xfe06a:    mov    $0x7000,%esp
+   0xfe070:    mov    $0xf3c2f,%edx
+   0xfe076:    jmp    0xfd12a
+   0xfe079:    push   %ebp
+   0xfe07b:    push   %edi
+   0xfe07d:    push   %esi
