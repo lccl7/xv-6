@@ -5,8 +5,38 @@ Part2:The BootLoader
 然后使用一个跳转指令设置CS:IP = 0000:7c00,然后把控制权交给BootLoader.
 
 BootLoader包含两部分：
-boot/boot.s
+boot/boot.s(in the download file this one is bootasm.S, the next is bootmain.c)
 boot/main.c
 BootLoader完成两个主要的任务：
 1.把处理器从实模式转变到32位保护模式，因为只有在32位模式下软件才会获得1M以上的物理地址
 2.BootLoader直接从IDE磁盘直接读取内核。
+Watch carefully the two file of the code.
+In boot.S(bootasm.S), set up the the stack pointer before call bootmain.
+The stack pointer is in the kernel not in the user mode. The stack pointer is used for
+call function and auto variables.
+
+Q1:t what point does the processor start executing 32-bit code? 
+What exactly causes the switch from 16- to 32-bit mode?
+A1: from real mode to protected mode. The instruction is:
+    ljmp  $PROT_MODE_CSEG, $protcseg
+
+Q2:What is the last instruction of the boot loader executed, 
+and what is the first instruction of the kernel it just loaded?
+A2: entry = (void(*)(void))(elf->entry); entry().
+    elf is pointer to 0x10000 which is transformed to struct elfhdr* type.
+    Then it is initialized through function readseg((uchar*)elf, 4096, 0).
+    If we want to get the first instruction of the kernel, which is also 
+    elf->entry point to, we should disassemble the kernel file in xv6: 
+    objdump -x kernel, then we can get the start address 0x0010000c.
+    we can also set a breakpoint here: b *0x10000c to get more info.
+    
+Q3:How does the boot loader decide how many sectors it must read in order to
+fetch the entire kernel from disk? Where does it find this information?
+A3:The VMA and LMA in .text section tells sth. The load address of a section is 
+   the memory address at which that section should be loaded into memory. 
+  The link address of a section is the memory address from which the section
+  expects to execute.
+  in bootmain.c, the for loop read the ELF head into the memory, then use 
+  entry() as the entry.
+  ELF 这种格式决定了所有关于 sector 的信息都存在文件头了，
+  bootmain 中把读入的头转换成了 Proghdr，里面就是 sector 的信息.
