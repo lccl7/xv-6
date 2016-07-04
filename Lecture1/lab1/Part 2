@@ -39,4 +39,6 @@ A3:The VMA and LMA in .text section tells sth. The load address of a section is
   in bootmain.c, the for loop read the ELF head into the memory, then use 
   entry() as the entry.
   ELF 这种格式决定了所有关于 sector 的信息都存在文件头了，
+  每一个ELF文件中都有一个Program Headers Table，用于指明ELF文件中哪些部分
+  被加载到内存，以及被加载到内存中的地址。
   bootmain 中把读入的头转换成了 Proghdr，里面就是 sector 的信息.
