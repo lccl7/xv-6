@@ -17,4 +17,78 @@ So if crt_pos is bigger than CRT_SIZE, then we should move(memmove) one row up s
 the last row will be left for what will be displayed. The for loop is used for displaying 
 space(' '). Then the position is located the right place.
 
-Q3:
+Q3:Trace the execution of the following code step-by-step:
+int x = 1, y = 3, z = 4;
+cprintf("x %d, y %x, z %d\n", x, y, z);
+In the call to cprintf(), to what does fmt point? To what does ap point?
+List (in order of execution) each call to cons_putc, va_arg, and vcprintf. For cons_putc, 
+list its argument as well. For va_arg, list what ap points to before and after the call. 
+For vcprintf list the values of its two arguments.
+
+A3: 
+int cprintf(const char *fmt, ...)
+{
+    va_list ap;
+    int cnt;
+
+    va_start(ap, fmt);
+    cnt = vcprintf(fmt, ap);
+    va_end(ap);
+
+    return cnt;
+}
+we know that fmt point to the first string of the parameters, i.e. "x %d, y %x, z %d",
+while ap point to the left ones, i.e. x, y, z.
+
+Q4: unsigned int i = 0x00646c72;
+    cprintf("H%x Wo%s", 57616, &i);
+  What is the output? Explain how this output is arrived at in the step-by-step manner of the previous exercise.
+
+A3: we know that %x is the format output of hex, and 57616 is e110 in base of hex.
+and for i, the value is 0x00646c72. so if the format output is string, then they split into four
+values as follows: 0x72('r'), 0x6c('l'), 0x64('d'), 0x00('\0').
+
+Q5: In the following code, what is going to be printed after 'y='? 
+(note: the answer is not a specific value.) Why does this happen?    cprintf("x=%d y=%d", 3);
+
+A5: x=3, y=-268435692. the value of y is trash.
+
+Stack
+Ex9:
+Q1: Determine where the kernel initializes its stack, and exactly where in memory its stack is located.
+A1: we know that the kernel starts with entry.S, so from this we can see that:
+    movl    $0x0,%ebp            # nuke frame pointer
+　　movl    $(bootstacktop),%esp
+　　and %ebp and %esp are registers that related with stack. and the address of bootstacktop is 0xf0110000
+　　and the size is KSTKSIZE =  8 * PGSIZE  = 8 * 4096 = 32KB. So the memory of stack is
+　　 0xf010F000-0xf0110000, the top is 0xf0110000, but the real space is  0x0010F000-0x00110000
+
+Q2:How does the kernel reserve space for its stack? 
+And at which "end" of this reserved area is the stack pointer initialized to point to?
+A2:To state a space of 32KB for using as the stack. And the end of the area is the bootstacktop, 
+which esp point to.
+
+%esp: points to the lowest location on the stack that is currently in use. Everything below 
+that location in the region reserved for the stack is free. Pushing a value onto the stack 
+involves decreasing the stack pointer and then writing the value to the place the stack pointer points to.
+Popping a value from the stack involves reading the value the stack pointer points to 
+and then increasing the stack pointer.In 32-bit mode, the stack can only hold 32-bit values, 
+and esp is always divisible by four. 
+
+%ebp: is associated with the stack primarily by software convention.On entry to a C function, 
+the function's prologue code normally saves the previous function's base pointer by pushing it onto the stack,
+and then copies the current esp value into ebp for the duration of the function. 
+是记录每一个程序的栈帧的相关信息的一个非常重要的寄存器。每一个程序在运行时都会分配给它一个栈帧，
+用于实现存放一些临时变量，传递参数给它调用的子函数等等功能。当现在进入某个子程序时，
+最先要运行的代码就是先把之前调用这个子程序的程序的ebp寄存器的值压入堆栈中保存起来，
+然后把ebp寄存器的值更新为当前esp寄存器的值。此时就相当于为这个子程序定义了它的ebp寄存器的值，
+也就是它栈帧的一个边界。只要所有的程序都遵循这样的编程规则，那么当我们运行到程序的任意一点时。
+我们可以通过在堆栈中保存的一系列ebp寄存器的值来回溯，
+弄清楚是怎样的一个函数调用序列使我们的程序运行到当前的这个点。
+
+Ex10:
+Every time use a stack, it will do as follows:
+1     push %ebp
+2     mov %esp, %ebp
+3     push %ebx
+4     sub $0x14, %esp //share an enough space for the stack.
