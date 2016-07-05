@@ -1,1 +1,20 @@
 Part 3:
+Ex8:
+Q1:Explain the interface between printf.c and console.c. Specifically,
+what function does console.c export? How is this function used by printf.c?
+A1:printf.c use the function cputchar() in console.c. 
+
+Q2:Explain the following in console.c:
+1   if (crt_pos >= CRT_SIZE) {
+2           int i;
+3           memmove(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * sizeof(uint16_t));
+4           for (i = CRT_SIZE - CRT_COLS; i < CRT_SIZE; i++)
+5                   crt_buf[i] = 0x0700 | ' ';
+6           crt_pos -= CRT_COLS;
+7   }
+A2: crt_pos is the position that will be displayed and CRT_SIZE is the window displayed.
+So if crt_pos is bigger than CRT_SIZE, then we should move(memmove) one row up so that
+the last row will be left for what will be displayed. The for loop is used for displaying 
+space(' '). Then the position is located the right place.
+
+Q3:
