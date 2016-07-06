@@ -92,3 +92,27 @@ Every time use a stack, it will do as follows:
 2     mov %esp, %ebp
 3     push %ebx
 4     sub $0x14, %esp //share an enough space for the stack.
+
+Ex11: Use function read_ebp() in inc/x86.h, we can get the pointer *ebp.
+Then the function mon_backtrace() as follows:
+int mon_backtrace(int argc, char *argv[], struct Trapframe *tf)
+{
+    int re_ebp = read_ebp();
+    re_ebp = *((int *)re_ebp);
+    int *ebp = (int *)re_ebp;
+    
+    cprintf("Stack backtrace:\n");
+    while((int)ebp != 0x00)
+    {
+        cprintf("  ebp %08x", (int)ebp);
+        cprintf("  ebp %08x", *(ebp+1));
+        cprintf("  args");
+        int i;
+        for(i = 2; i < 7; i++)
+            cprintf(" %0x80", *(ebp+i));
+        cprintf("\n");
+        ebp = (int*)(*ebp);
+    }
+}
+
+Ex12:
