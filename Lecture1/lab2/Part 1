@@ -1,0 +1,8 @@
+Ex1: In the file kern/pmap.c, you must implement code for 
+the following functions (probably in the order given).
+boot_alloc()
+mem_init() (only up to the call to check_page_free_list(1))
+page_init()
+page_alloc()
+page_free()
+A1:
