@@ -6,3 +6,5 @@
 相关模拟器工具的使用请参考：https://sipb.mit.edu/iap/6.828/labguide/
 
 摘录部分Reference：JOS makefile, JOS obj/, GDB, QEMU
+
+cmake
